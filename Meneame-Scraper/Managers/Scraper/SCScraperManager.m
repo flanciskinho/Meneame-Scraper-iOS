@@ -44,139 +44,53 @@
 
 - (void)loginWithUsername:(NSString *)userName password:(NSString *)password completion:(void(^)(NSDictionary *user, NSError *error))completion {
     
-    NSURL *url = [NSURL URLWithString:@"https://www.meneame.net/login"];
-    NSDictionary *params = @{@"username": userName, @"password": password, @"login": @"", @"processlogin": @"1", @"return": @"/", @"persistent": @"on"};
-    
-    [self.webScraper post:url params:params completion:^(NSString *sourceCode, NSError *error) {
-        
-        NSString *userInfo = [sourceCode substringFromString:@"<ul id=\"userinfo\">" toString:@"</ul>"];
-        
-        NSDictionary *user;
-        if (![userInfo containsString:@">login<"] && ![userInfo containsString:@">registrarse<"]) {
-            user = @{@"name": [userInfo substringFromString:@"<a href=\"/user/" toString:@"\""],
-                     @"image": [userInfo substringFromString:@"data-src=\"" toString:@"\""]
-                     };
-        }
-        
-        if (completion) {
-            completion(user, error);
-        }
-    }];
+    if (completion) {
+        completion(nil, [NSError new]);
+    }
 }
 
 - (void)logoutWithcompletion:(void(^)(BOOL result, NSError *error))completion {
     
-    NSURL *url = [NSURL URLWithString:@"https://www.meneame.net/login"];
-    NSDictionary *params = @{@"op": @"logout", @"return": @"/"};
-    
-    [self.webScraper post:url params:params completion:^(NSString *sourceCode, NSError *error) {
-        
-        //Delete all Cookies
-        NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-        for (NSHTTPCookie *cookie in cookieStorage.cookies) {
-            [cookieStorage deleteCookie:cookie];
-        }
-        
-        if (completion) {
-            completion(YES, error);
-        }
-    }];
+    if (completion) {
+        completion(nil, nil);
+    }
 }
 
 #pragma mark - News
 
 - (void)newsFromPage:(NSInteger)page completion:(void(^)(NSDictionary *newsList, NSError *error))completion {
     
-//    NSDictionary *dictionary = @{@"page": @(page), @"elements": @[SCNewsVO exampleObject]]};
-//    if (completion) {
-//        completion(dictionary, nil);
-//    }
-    
-    NSURL *url = [NSURL URLWithString:@"https://www.meneame.net/"];
-    NSDictionary *params = @{@"page": @(page)};
-    
-    [self.webScraper get:url params:params completion:^(NSString *sourceCode, NSError *error) {
-
-        NSArray *news = [SCNewsVO newsFromSourceCode:sourceCode];
-
-        NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:@{@"page": @(page), @"elements": news}];
-        [dictionary addEntriesFromDictionary:[self getWebInfoFromSourceCode:sourceCode]];
-        
-        if (completion) {
-            completion(dictionary, error);
-        }
-    }];
+    NSDictionary *dictionary = @{@"page": @(page), @"elements": @[[SCNewsVO exampleObject]]};
+    if (completion) {
+        completion(dictionary, nil);
+    }
 }
 
 #pragma mark - Notifications
 
 - (void)notificationsWithCompletion:(void(^)(NSDictionary *notifications, NSError *error))completion {
     
-    NSURL *url = [NSURL URLWithString:@"https://www.meneame.net/backend/notifications.json"];
-    NSDictionary *params = @{@"check": @(1), @"has_focus": @"true"};
-    
-    AFHTTPSessionManager *sessionManager = [[AFHTTPSessionManager alloc] initWithBaseURL:nil sessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
-    sessionManager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    sessionManager.responseSerializer = [AFJSONResponseSerializer serializer];
-    [sessionManager GET:url.absoluteString parameters:params progress:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        
-        if (completion) {
-            completion(responseObject, nil);
-        }
-        
-    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-
-        if (completion) {
-            completion(nil, error);
-        }
-    }];
+    if (completion) {
+        completion(nil, nil);
+    }
 }
 
 #pragma mark - Search
 
 - (void)search:(NSString *)string completion:(void(^)(NSDictionary *data, NSError *error))completion {
     
-    NSURL *url = [NSURL URLWithString:@"https://www.meneame.net/search"];
-    NSDictionary *params = @{@"q": string,
-                             @"w": @"links",
-                             @"p": @"",
-                             @"s": @"",
-                             @"h": @"",
-                             @"o": @"",
-                             @"u": @""
-                             };
-    
-    [self.webScraper get:url params:params completion:^(NSString *sourceCode, NSError *error) {
-        
-        NSArray *news = [SCNewsVO newsFromSourceCode:sourceCode];
-        
-        NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:@{@"page": @(1), @"elements": news}];
-        [dictionary addEntriesFromDictionary:[self getWebInfoFromSourceCode:sourceCode]];
-        
-        if (completion) {
-            completion(dictionary, error);
-        }
-    }];
+    if (completion) {
+        completion(nil, nil);
+    }
 }
 
 #pragma mark - Preferences
 
 - (void)showOnlyMySubs:(BOOL)show userId:(NSString *)userId controlKey:(NSString *)controlKey completion:(void(^)(NSError *error))completion {
     
-    NSURL *url = [NSURL URLWithString:@"https://www.meneame.net/backend/pref"];
-    NSDictionary *params = @{@"id": userId,
-                             @"value": show ? @"1" : @"0",
-                             @"key": @"subs_default",
-                             @"set": @"1",
-                             @"control_key": controlKey
-                             };
-    
-    [self.webScraper post:url params:params completion:^(NSString *sourceCode, NSError *error) {
-        
-        if (completion) {
-            completion(error);
-        }
-    }];
+    if (completion) {
+        completion(nil);
+    }
 }
 
 #pragma mark - Utils
